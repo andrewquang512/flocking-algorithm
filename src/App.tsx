@@ -1,8 +1,8 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stats, OrbitControls } from '@react-three/drei';
-import Boid from './boid';
-import { WINDOW_WIDTH, WINDOW_HEIGHT } from './constants';
+import { WINDOW_WIDTH, WINDOW_HEIGHT, OBJECT_SIZE } from './constants';
+import BoidManager from './boidManager';
 
 function App() {
   return (
@@ -19,10 +19,15 @@ function App() {
         overflow: 'hidden',
         backgroundColor: '#000000',
       }}
-      camera={{ zoom: 1, position: [0, 0, 100], near: 0.001, far: 1000 }}
+      camera={{
+        zoom: 1,
+        position: [0, 0, OBJECT_SIZE],
+        near: 0.001,
+        far: 1000,
+      }}
     >
-      <Boid />
-      <OrbitControls />
+      <BoidManager />
+      {/* <OrbitControls /> */}
     </Canvas>
   );
 }
