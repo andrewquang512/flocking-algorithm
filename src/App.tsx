@@ -1,7 +1,7 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stats, OrbitControls } from '@react-three/drei';
-import { WINDOW_WIDTH, WINDOW_HEIGHT, OBJECT_SIZE } from './constants';
+import { WINDOW_WIDTH, WINDOW_HEIGHT, Z_INDEX } from './constants';
 import BoidManager from './boidManager';
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
       }}
       camera={{
         zoom: 1,
-        position: [0, 0, OBJECT_SIZE],
+        position: [0, 0, Z_INDEX],
         near: 0.001,
         far: 1000,
       }}
