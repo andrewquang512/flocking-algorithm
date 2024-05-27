@@ -27,7 +27,7 @@ function App() {
       }}
     >
       <BoidManager />
-      {/* <OrbitControls /> */}
+      <OrbitControls />
     </Canvas>
   );
 }
