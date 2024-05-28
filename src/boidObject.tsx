@@ -1,5 +1,11 @@
 import { MeshProps, useFrame, useThree } from '@react-three/fiber';
-import React, { RefObject, useRef, useState } from 'react';
+import React, {
+  RefObject,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Mesh, MeshBasicMaterial, RingGeometry, Vector2, Vector3 } from 'three';
 import {
   MAX_X,
@@ -14,63 +20,68 @@ import {
   Z_INDEX,
 } from './constants';
 import { getRandomEnumValue, getRandomInList } from './utils';
+import { BoidProps, Position, Velocity, VelocityHandle } from './interfaces';
 
-interface Position {
-  positionX: number;
-  positionY: number;
-}
-export default function Boid(position: Position) {
+function Boid({ position, velocity }: BoidProps, ref: any) {
   const [angle, setAngle] = useState(Math.random() * Math.PI * 2);
   const objectRef = useRef<MeshProps>();
   const { positionX, positionY } = position;
-  const [velocity, setVelocity] = useState(() => {
-    const velocityX = getRandomEnumValue(SpeedLevel) * SPEED;
-    const velocityY =
-      getRandomEnumValue(SpeedLevel, !velocityX ? [SpeedLevel.STOP] : []) *
-      SPEED;
-    return new Vector3(velocityX, velocityY, 0);
+  const [vectorVelocity, setVectorVelocity] = useState(() => {
+    return new Vector3(velocity.velocityX, velocity.velocityY, 0);
   });
-  // Animation and collision detection
+
+  useImperativeHandle(ref, () => {
+    return {
+      updateVelocity: (newVelocity: Vector3) => {
+        console.log('vectorVelocity', vectorVelocity);
+        console.log('newVelocity', newVelocity);
+        setVectorVelocity(vectorVelocity.add(newVelocity));
+      },
+      getVelocity: () => {
+        return vectorVelocity;
+      },
+    };
+  });
+
   useFrame(({ clock, camera }) => {
-    const elapsedTime = clock.getElapsedTime();
-    console.log('WINDOW_WIDTH:', WINDOW_WIDTH);
-    console.log('WINDOW_HEIGHT:', WINDOW_HEIGHT);
-    console.log('elapsedTime:', elapsedTime);
+    console.log('useFrame-Boid');
+    if (!objectRef.current) return;
 
-    if (objectRef.current?.position) {
-      const currentPosition = objectRef.current.position as Vector3;
-      console.log('angle:', angle);
-      //   const direction = new Vector3(1, 1, 0); // Move along the x-axis
-      console.log('currentPosition:', currentPosition);
+    const currentPosition = objectRef.current.position as Vector3;
+    // console.log('angle:', angle);
+    // console.log('currentPosition:', currentPosition);
 
-      // Calculate and update the new position
-      currentPosition.add(velocity);
-      console.log('newPosition:', currentPosition);
-      // Check for collisions with view sides
-      if (currentPosition.x > MAX_X || currentPosition.x < MIN_X) {
-        // Reverse direction if collision with left or right side
-        setVelocity(new Vector3(-velocity.x, velocity.y, velocity.z));
-      }
-      if (currentPosition.y > MAX_Y || currentPosition.y < MIN_Y) {
-        // Reverse direction if collision with top or bottom side
-        setVelocity(new Vector3(velocity.x, -velocity.y, velocity.z));
-      }
+    // Calculate and update the new position
+    currentPosition.add(vectorVelocity);
+    // console.log('newPosition:', currentPosition);
+    // Check for collisions with view sides
+    // if (currentPosition.x > MAX_X || currentPosition.x < MIN_X) {
+    //   // Reverse direction if collision with left or right side
+    //   setVectorVelocity(
+    //     new Vector3(-vectorVelocity.x, vectorVelocity.y, vectorVelocity.z),
+    //   );
+    // }
+    // if (currentPosition.y > MAX_Y || currentPosition.y < MIN_Y) {
+    //   // Reverse direction if collision with top or bottom side
+    //   setVectorVelocity(
+    //     new Vector3(vectorVelocity.x, -vectorVelocity.y, vectorVelocity.z),
+    //   );
+    // }
 
-      // const newX = Math.sin(angle * SPEED) + currentPosition.x;
-      // const newX = isReverseX
-      //   ? currentPosition.x - SPEED
-      //   : SPEED + currentPosition.x;
-      // const newY = isReverseY
-      //   ? currentPosition.y - SPEED
-      //   : SPEED + currentPosition.y;
-      // const newX = elapsedTime * SPEED * (WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2);
-      // const newY =
-      //   Math.cos(elapsedTime * SPEED) * (WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2);
+    // const newX = Math.sin(angle * SPEED) + currentPosition.x;
+    // const newX = isReverseX
+    //   ? currentPosition.x - SPEED
+    //   : SPEED + currentPosition.x;
+    // const newY = isReverseY
+    //   ? currentPosition.y - SPEED
+    //   : SPEED + currentPosition.y;
+    // const newX = elapsedTime * SPEED * (WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2);
+    // const newY =
+    //   Math.cos(elapsedTime * SPEED) * (WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2);
 
-      // Update object position
-      // currentPosition.x = WINDOW_WIDTH / 2 - OBJECT_SIZE / 2;
-      // currentPosition.y = WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2;
-    }
+    // Update object position
+    // currentPosition.x = WINDOW_WIDTH / 2 - OBJECT_SIZE / 2;
+    // currentPosition.y = WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2;
   });
 
   return (
@@ -83,3 +94,5 @@ export default function Boid(position: Position) {
     </mesh>
   );
 }
+
+export default forwardRef<VelocityHandle, BoidProps>(Boid);
