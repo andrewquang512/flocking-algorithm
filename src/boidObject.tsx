@@ -6,7 +6,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Mesh, MeshBasicMaterial, RingGeometry, Vector2, Vector3 } from 'three';
+import {
+  Color,
+  Mesh,
+  MeshBasicMaterial,
+  RingGeometry,
+  Vector2,
+  Vector3,
+} from 'three';
 import {
   MAX_X,
   MAX_Y,
@@ -22,7 +29,10 @@ import {
 import { getRandomEnumValue, getRandomInList } from './utils';
 import { BoidProps, Position, Velocity, VelocityHandle } from './interfaces';
 
-function Boid({ position, velocity }: BoidProps, ref: any) {
+function Boid(
+  { position, velocity, color = new Color('royalblue') }: BoidProps,
+  ref: any,
+) {
   const [angle, setAngle] = useState(Math.random() * Math.PI * 2);
   const objectRef = useRef<MeshProps>();
   const { positionX, positionY } = position;
@@ -43,7 +53,7 @@ function Boid({ position, velocity }: BoidProps, ref: any) {
     };
   });
 
-  useFrame(({ clock, camera }) => {
+  setInterval(() => {
     console.log('useFrame-Boid');
     if (!objectRef.current) return;
 
@@ -82,7 +92,7 @@ function Boid({ position, velocity }: BoidProps, ref: any) {
     // Update object position
     // currentPosition.x = WINDOW_WIDTH / 2 - OBJECT_SIZE / 2;
     // currentPosition.y = WINDOW_HEIGHT / 2 - OBJECT_SIZE / 2;
-  });
+  }, 100);
 
   return (
     <mesh
@@ -90,7 +100,7 @@ function Boid({ position, velocity }: BoidProps, ref: any) {
       position={[positionX, positionY, -Z_INDEX]}
     >
       <boxGeometry args={[OBJECT_SIZE, OBJECT_SIZE, Z_INDEX]} />
-      <meshBasicMaterial color="royalblue" />
+      <meshBasicMaterial color={color} />
     </mesh>
   );
 }

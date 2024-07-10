@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Color, Vector3 } from 'three';
 
 export interface Position {
   positionX: number;
@@ -13,6 +13,7 @@ export interface Velocity {
 export interface BoidProps {
   velocity: Velocity;
   position: Position;
+  color: Color;
 }
 
 export type VelocityHandle = {
